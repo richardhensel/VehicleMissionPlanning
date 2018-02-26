@@ -1,13 +1,15 @@
-
 import os, sys, math, pygame, pygame.mixer
 
 from pygame.locals import *
 from pygame.key import *
 
-from CarModel import CarModel
+import euclid
+import Functions
+
+from CarModel import CarModel, CarPose
 
 
-class Visualizer:
+class Visualizer():
 
     def __init__(self, config):
 
@@ -21,52 +23,49 @@ class Visualizer:
         self.carLineWidth = config.carLineWidth
 
         self.screenOffsetVector = euclid.Vector3(0.0, 0.0, 0.0)
-        self.carModel = CarModel(config, CarPose(0.0, 0.0, 0.0)
+        self.carModel = CarModel(config, CarPose(0.0, 0.0, 0.0))
  
+    def draw(self, carPose):
+        self.startDrawing()
+        self.drawCar(carPose)
+        self.finishDrawing()
 
-    def startDrawing(self, carPose, screenCentre):
+
+    def startDrawing(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.quit = True
                 pygame.quit()
                 sys.exit()
 
-        screen.fill((255,255,255))
+        self.screen.fill((255,255,255))
 
 
-    def finishDrawing(self, carPose, screenCentre):
-        self.drawCars()
-        self.draw
-        screen.unlock()
+    def finishDrawing(self):
+        self.screen.unlock()
         pygame.display.flip()
-
-
-   # def updateCarPosition(self, carPose, screenCentre):
-   #     if len(poseList) not == self.config.numCars
 
  
     def drawCar(self, carPose):
-        screenOffsetVector = euclid.Vector3(self.screenOffset[0], self.screenOffset[1], 0.0)
+        #screenOffsetVector = euclid.Vector3(self.screenOffset[0], self.screenOffset[1], 0.0)
+
 
         if carPose.carId == 1:
-            screenSizeVector = euclid.Vector3(self.screenSize[0], self.screenSize[1], 0.0)
             carPosVector = euclid.Vector3(carPose.x, carPose.y, 0.0)
-            screenOffsetVector = 0.5 * screenSizeVector - carPosVector
+            self.screenOffsetVector = 0.5 * self.screenSizeVector - carPosVector
 
         
         #back left, front left, front right, back right.
-          
 
         #Compute offsets
-        poseVector = euclid.Vector3(carPose.x, carPose.y, 0.0) + screenOffsetVector
+        poseVector = euclid.Vector3(carPose.x, carPose.y, 0.0) + self.screenOffsetVector
         
         self.carModel.setPose(carPose.x, carPose.y, carPose.heading)
-        corners = self.carModel.getCorners():
+        corners = self.carModel.getCorners()
 
-        bl = corners[0] + screen_offset_vec #back left
-        fl = corners[1] + screen_offset_vec
-        fr = corners[2] + screen_offset_vec
-        br = corners[3] + screen_offset_vec #back right
+        bl = corners[0] + self.screenOffsetVector #back left
+        fl = corners[1] + self.screenOffsetVector
+        fr = corners[2] + self.screenOffsetVector
+        br = corners[3] + self.screenOffsetVector #back right
 
         #Draw car
         #Draw the offset points
@@ -75,6 +74,12 @@ class Visualizer:
 
         #Draw origin
         pygame.draw.circle(self.screen, (255,0,0), (int(poseVector.x),int(poseVector.y)), 2, 0)
+
+
+        def drawObstacles(self):
+
+            for obstacle in self.obstacles:
+                pygame.draw.lines(self.screen, (0,0,0), False, obstacle, self.carLineWidth)
 
    # def drawVectors(self):
         #so = self.sensor_origin + screen_offset_vec
@@ -95,5 +100,26 @@ class Visualizer:
    #             pygame.draw.circle(screen_handle, (255,0,0), (int(line[1].x), int(line[1].y)), 2, 0)
    #         pygame.draw.lines(screen_handle, (0,0,0), False, sensor_list, self.line_width)
 
+    def getSlewRate(self):
 
+        keys = pygame.key.get_pressed()
 
+        # Sets the quit flags
+        if keys[pygame.K_a] == True:
+            return -10
+        elif keys[pygame.K_f] == True:
+            return 10
+        else:
+            return 0
+
+    def getAcceleration(self):
+
+        keys = pygame.key.get_pressed()
+
+        # Sets the quit flags
+        if keys[pygame.K_m] == True:
+            return -10
+        elif keys[pygame.K_k] == True:
+            return 10
+        else:
+            return 0

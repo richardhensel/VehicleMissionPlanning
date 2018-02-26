@@ -1,31 +1,34 @@
-import os, sys, math, pygame, pygame.mixer
-import random
-import euclid
+import pygame, pygame.mixer
 from pygame.locals import *
 from pygame.key import *
 
-from CarModel import CarModel
+import sys
+sys.path.append('../libs/')
+sys.path.append('../config/')
 
-display = True
-
-# Set the screen size
-if display:
+from CarModel import CarModel, CarPose
+from Visualization import Visualizer
+from Config import Config
 
 clock = pygame.time.Clock()
 
+config = Config()
+
+# create car and visualizer inputs. 
+car = CarModel(config, CarPose(1000, 800, 0.0))
+visualizer = Visualizer(config)
+
 while True:
 
-    environment.get_user_input()
-    environment.control()
-
     #Limit the framerate
-    dtime_ms = clock.tick(fpsLimit)/1000.0
+    timeDelta = clock.tick(config.fpsLimit)/1000.0
 
-    environment.update(dtime)
-    environment.check_finish()
-
-
+    car.setSlewRate(visualizer.getSlewRate())
+    car.setAcceleration(visualizer.getAcceleration())
 
 
+    car.update(timeDelta)
 
+    visualizer.draw(car.getPose())
+    
 

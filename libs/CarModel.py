@@ -5,15 +5,15 @@ from pygame.locals import *
 
 import csv
 
-class CarPose:
-    def __init__(self):
+class CarPose():
+    def __init__(self, x, y, heading):
 
         self.carId = 1
         self.x = 0.0
         self.y = 0.0
         self.heading = 0.0
 
-class Car():
+class CarModel():
 
     def __init__(self, config, carPose):
 
@@ -30,6 +30,10 @@ class Car():
         self.width = config.carWidth    #pixels 
         self.carRearWheelDist = config.carRearWheelDist
 
+        #obstacles
+        #self.obstacles = config.obstacles
+        self.carBounds = []
+        self.__update_geometry()
 
     ####
     #set car variables
@@ -63,14 +67,14 @@ class Car():
         return self.carBounds
 
     
-    def update(self, timeDelta, obstacles):
+    def update(self, timeDelta):
         #self.__reset_sensors()
         self.__updateDynamics(timeDelta)
         self.__update_geometry()
 
-        for obstacle in obstacles:
-           # self.__sense(obstacle)
-            self.__detect_collision(obstacle)
+        #for obstacle in obstacles:
+        #   # self.__sense(obstacle)
+        #    self.__detect_collision(obstacle)
 
 
     def __updateDynamics(self, timeDelta):
@@ -98,9 +102,10 @@ class Car():
         positionVector = euclid.Vector3(self.pose.x, self.pose.y,0.0)  # location vectors
         headingVector = euclid.Vector3(self.pose.heading, 0.0, 0.0)  # orientation vector unit vector centered at the car's origin. 
 
-        self.carBounds[0] =  positionVector + headingVector.rotate_around( euclid.Vector3(0.,0.,1.), -0.5*math.pi)* self.width/2 - headingVector * self.carRearWheelDist
+        self.carBounds = [euclid.Vector3]*4
+        self.carBounds[0] = positionVector + headingVector.rotate_around( euclid.Vector3(0.,0.,1.), -0.5*math.pi)* self.width/2 - headingVector * self.carRearWheelDist
         self.carBounds[1] = self.carBounds[0] + headingVector * self.length
-        self.carBounds[2] = self.carBounds[3] + headingVector * self.length
+        self.carBounds[2] = self.carBounds[1] + headingVector.rotate_around( euclid.Vector3(0.,0.,1.), 0.5*math.pi)* self.width
         self.carBounds[3] = positionVector + headingVector.rotate_around( euclid.Vector3(0.,0.,1.), 0.5*math.pi)* self.width/2  - headingVector * self.carRearWheelDist
         #self.sensorOrigin = positionVector + self.sensor_carRearWheelDist * self.length * headingVector # sensor origin is 1 quarter of the length from the front of the car
 
