@@ -1,3 +1,5 @@
+#! /usr/bin/python
+
 import pygame, pygame.mixer
 from pygame.locals import *
 from pygame.key import *
@@ -23,12 +25,12 @@ while True:
     #Limit the framerate
     timeDelta = clock.tick(config.fpsLimit)/1000.0
 
+
     car.setSlewRate(visualizer.getSlewRate())
     car.setAcceleration(visualizer.getAcceleration())
 
 
     car.update(timeDelta)
-
     visualizer.draw(car.getPose())
     
 

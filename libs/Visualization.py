@@ -24,9 +24,14 @@ class Visualizer():
 
         self.screenOffsetVector = euclid.Vector3(0.0, 0.0, 0.0)
         self.carModel = CarModel(config, CarPose(0.0, 0.0, 0.0))
+
+
+        self.carSlewRate = config.carSlewRate
+        self.carAcceleration = config.carAcceleration
  
     def draw(self, carPose):
         self.startDrawing()
+        self.drawObstacles()
         self.drawCar(carPose)
         self.finishDrawing()
 
@@ -48,7 +53,6 @@ class Visualizer():
     def drawCar(self, carPose):
         #screenOffsetVector = euclid.Vector3(self.screenOffset[0], self.screenOffset[1], 0.0)
 
-
         if carPose.carId == 1:
             carPosVector = euclid.Vector3(carPose.x, carPose.y, 0.0)
             self.screenOffsetVector = 0.5 * self.screenSizeVector - carPosVector
@@ -57,9 +61,10 @@ class Visualizer():
         #back left, front left, front right, back right.
 
         #Compute offsets
-        poseVector = euclid.Vector3(carPose.x, carPose.y, 0.0) + self.screenOffsetVector
+        #poseVector = euclid.Vector3(carPose.x, carPose.y, 0.0) + self.screenOffsetVector
         
         self.carModel.setPose(carPose.x, carPose.y, carPose.heading)
+        self.carModel.update(0.0)
         corners = self.carModel.getCorners()
 
         bl = corners[0] + self.screenOffsetVector #back left
@@ -67,19 +72,31 @@ class Visualizer():
         fr = corners[2] + self.screenOffsetVector
         br = corners[3] + self.screenOffsetVector #back right
 
+        offsetCarPosVector = carPosVector + self.screenOffsetVector
+
+        print ""
+        print carPosVector
+        print corners
+        
+
         #Draw car
         #Draw the offset points
         pointList = [(bl.x, bl.y), (fl.x, fl.y), (fr.x, fr.y), (br.x, br.y)]
         pygame.draw.lines(self.screen, self.carColor, True, pointList, self.carLineWidth)
 
         #Draw origin
-        pygame.draw.circle(self.screen, (255,0,0), (int(poseVector.x),int(poseVector.y)), 2, 0)
+        pygame.draw.circle(self.screen, (255,0,0), (int(offsetCarPosVector.x),int(offsetCarPosVector.y)), 2, 0)
 
 
-        def drawObstacles(self):
+    def drawObstacles(self):
 
-            for obstacle in self.obstacles:
-                pygame.draw.lines(self.screen, (0,0,0), False, obstacle, self.carLineWidth)
+        for obstacle in self.obstacles:
+
+            offsetObstacle = []
+            for point in obstacle:
+                offsetObstacle.append((point[0]+self.screenOffsetVector.x, point[1]+self.screenOffsetVector.y))
+
+            pygame.draw.lines(self.screen, (0,0,0), False, offsetObstacle, self.carLineWidth)
 
    # def drawVectors(self):
         #so = self.sensor_origin + screen_offset_vec
@@ -106,20 +123,21 @@ class Visualizer():
 
         # Sets the quit flags
         if keys[pygame.K_a] == True:
-            return -10
+            return -1 * self.carSlewRate
         elif keys[pygame.K_f] == True:
-            return 10
+            return self.carSlewRate
         else:
             return 0
 
+        self.carAcceleration = config.carAcceleration
     def getAcceleration(self):
 
         keys = pygame.key.get_pressed()
 
         # Sets the quit flags
-        if keys[pygame.K_m] == True:
-            return -10
+        if keys[pygame.K_j] == True:
+            return -1 * self.carAcceleration
         elif keys[pygame.K_k] == True:
-            return 10
+            return self.carAcceleration
         else:
             return 0
