@@ -1,7 +1,7 @@
 
 import random
 
-def get_line_intersection(p1, p2, p3, p4):
+def getLineIntersection(p1, p2, p3, p4):
     try:
         s1 = (p2[0] - p1[0], p2[1] - p1[1])
         s2 = (p4[0] - p3[0], p4[1] - p3[1])
@@ -38,7 +38,7 @@ def truncate(f, n):
     i, p, d = s.partition('.')
     return '.'.join([i, (d+'0'*n)[:n]])
 
-def invert_bools(bool_list):
+def invertBools(bool_list):
     print bool_list
     if not all(isinstance(item, int) for item in bool_list):
         raise AssertionError('bool list must contain only ints')
@@ -61,7 +61,7 @@ def invert_bools(bool_list):
     new_list[index] = 1
     return new_list
             
-def make_binary(start_list):
+def makeBinary(start_list):
 
     new_list = start_list[:]
     index_list = []

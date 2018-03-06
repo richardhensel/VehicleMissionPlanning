@@ -14,7 +14,7 @@ class Visualizer():
     def __init__(self, config):
 
 
-        self.screenSizeVector = euclid.Vector3(config.screenSize[0], config.screenSize[1], 0.0)
+        self.screenSizeVector = euclid.Vector2(config.screenSize[0], config.screenSize[1])
 
         self.screen = pygame.display.set_mode((config.screenSize[0], config.screenSize[1]))
 
@@ -24,7 +24,6 @@ class Visualizer():
 
         self.screenOffsetVector = euclid.Vector3(0.0, 0.0, 0.0)
         self.carModel = CarModel(config, CarPose(0.0, 0.0, 0.0))
-
 
         self.carSlewRate = config.carSlewRate
         self.carAcceleration = config.carAcceleration
@@ -53,10 +52,8 @@ class Visualizer():
     def drawCar(self, carPose):
         #screenOffsetVector = euclid.Vector3(self.screenOffset[0], self.screenOffset[1], 0.0)
 
-        if carPose.carId == 1:
-            carPosVector = euclid.Vector3(carPose.x, carPose.y, 0.0)
-            self.screenOffsetVector = 0.5 * self.screenSizeVector - carPosVector
-
+        carPosVector = euclid.Vector2(carPose.x, carPose.y)
+        self.screenOffsetVector = 0.5 * self.screenSizeVector - carPosVector
         
         #back left, front left, front right, back right.
 
@@ -67,17 +64,12 @@ class Visualizer():
         self.carModel.update(0.0)
         corners = self.carModel.getCorners()
 
-        bl = corners[0] + self.screenOffsetVector #back left
-        fl = corners[1] + self.screenOffsetVector
-        fr = corners[2] + self.screenOffsetVector
-        br = corners[3] + self.screenOffsetVector #back right
+        bl = euclid.Vector2(corners[0][0], corners[0][1]) + self.screenOffsetVector #back left
+        fl = euclid.Vector2(corners[1][0], corners[1][1]) + self.screenOffsetVector
+        fr = euclid.Vector2(corners[2][0], corners[2][1]) + self.screenOffsetVector
+        br = euclid.Vector2(corners[3][0], corners[3][1]) + self.screenOffsetVector #back right
 
         offsetCarPosVector = carPosVector + self.screenOffsetVector
-
-        print ""
-        print carPosVector
-        print corners
-        
 
         #Draw car
         #Draw the offset points

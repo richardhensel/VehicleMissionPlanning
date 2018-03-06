@@ -32,7 +32,7 @@ class Config():
         self.carColor = 0,0,0              #black
         self.carLineWidth = 3
  
-        self.carSlewRate = 0.03
+        self.carSlewRate = 0.07
         self.carAcceleration = 50.0
-        self.carMaxSteeringAngle = 1
-        self.carMaxVelocity = 100
+        self.carMaxSteeringAngle = 0.01
+        self.carMaxVelocity = 200
